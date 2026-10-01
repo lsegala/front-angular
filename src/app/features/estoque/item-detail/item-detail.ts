@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DOCUMENT, DestroyRef, OnInit, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { isAppError } from '../../../core/error-handling/app-error';
 import { NotificationService } from '../../../core/error-handling/notification.service';
 import { TranslatePipe } from '../../../core/localization/translate.pipe';
 import { TranslationService } from '../../../core/localization/translation.service';
@@ -30,8 +31,16 @@ export class ItemDetail implements OnInit {
   protected readonly item = signal<InventoryItem | null>(null);
   protected readonly loading = signal(true);
   protected readonly notFound = signal(false);
+  protected readonly loadFailed = signal(false);
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  protected load(): void {
+    this.loading.set(true);
+    this.notFound.set(false);
+    this.loadFailed.set(false);
     this.inventory
       .getById(this.id())
       .pipe(
@@ -40,7 +49,11 @@ export class ItemDetail implements OnInit {
       )
       .subscribe({
         next: (item) => this.item.set(item),
-        error: () => this.notFound.set(true),
+        // Só 404 é "não encontrado"; as demais falhas já foram notificadas pelo interceptor.
+        error: (error: unknown) =>
+          isAppError(error) && error.kind === 'not-found'
+            ? this.notFound.set(true)
+            : this.loadFailed.set(true),
       });
   }
 
