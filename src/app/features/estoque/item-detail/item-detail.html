@@ -4,6 +4,15 @@
   <h1>{{ 'estoque.detail.title' | translate }}</h1>
   <div class="alert alert--error">{{ 'estoque.detail.notFound' | translate }}</div>
   <a routerLink="/estoque">{{ 'common.actions.back' | translate }}</a>
+} @else if (loadFailed()) {
+  <h1>{{ 'estoque.detail.title' | translate }}</h1>
+  <div class="alert alert--error">
+    <p>{{ 'estoque.detail.loadFailed' | translate }}</p>
+    <button type="button" class="btn btn--secondary btn--small" (click)="load()">
+      {{ 'estoque.list.retry' | translate }}
+    </button>
+  </div>
+  <a routerLink="/estoque">{{ 'common.actions.back' | translate }}</a>
 } @else if (item(); as item) {
   <header class="page-header">
     <h1>{{ item.name }}</h1>

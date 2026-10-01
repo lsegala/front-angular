@@ -38,6 +38,7 @@
     "updatedAt": "Última atualização",
     "lowStockWarning": "Atenção: a quantidade está igual ou abaixo do estoque mínimo.",
     "notFound": "Item não encontrado. Ele pode ter sido excluído.",
+    "loadFailed": "Não foi possível carregar o item.",
     "deleteConfirm": "Deseja realmente excluir o item \"{{name}}\"? Esta ação não pode ser desfeita.",
     "deleted": "Item excluído com sucesso."
   },
