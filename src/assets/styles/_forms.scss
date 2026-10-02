@@ -1,8 +1,8 @@
 .form {
-  max-width: 32rem;
+  max-width: var(--form-max-width);
 
   &--wide {
-    max-width: 56rem;
+    max-width: var(--form-max-width-wide);
   }
 }
 
@@ -32,7 +32,7 @@
 .field__label {
   display: block;
   margin-bottom: 0.25rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .field__required {
@@ -43,15 +43,15 @@
 .field__hint {
   margin: 0 0 0.375rem;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .field__input {
   display: block;
   width: 100%;
-  min-height: 2.75rem; // área de toque mínima de 44px
+  min-height: var(--size-touch);
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border);
+  border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-bg);
   color: var(--color-text);
@@ -79,7 +79,7 @@
 // A cor nunca é o único indicador (e-MAG 4.1 / WCAG 1.4.1).
 .field--invalid {
   .field__input {
-    border: 2px solid var(--color-danger);
+    border: var(--border-width-strong) solid var(--color-danger);
   }
 
   .field__label {
@@ -94,7 +94,7 @@
   margin: 0.375rem 0 0;
   color: var(--color-danger);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .field-error__icon {
@@ -105,42 +105,42 @@
   width: 1.25rem;
   height: 1.25rem;
   margin-top: 0.125rem;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--color-danger);
   color: var(--color-danger-contrast);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs);
   line-height: 1;
 }
 
 .field__counter {
   margin: 0.25rem 0 0;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 // ---------- Resumo de erros ----------
 
 .error-summary {
-  max-width: 56rem;
+  max-width: var(--form-max-width-wide);
   margin-bottom: 1.5rem;
   padding: 1rem 1.25rem;
-  border: 3px solid var(--color-danger);
+  border: var(--border-width-emphasis) solid var(--color-danger);
   border-radius: var(--radius);
   background: var(--color-bg);
 
   &:focus {
-    outline: 3px solid var(--color-focus);
-    outline-offset: 2px;
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
   }
 
   a {
     color: var(--color-danger);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 }
 
 .error-summary__title {
-  font-size: 1.25rem;
+  font-size: var(--font-size-lg);
 }
 
 .error-summary__list {

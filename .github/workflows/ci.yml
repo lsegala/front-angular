@@ -1,0 +1,96 @@
+# Pipeline de integração: roda em todo PR e em todo push na main.
+# Cada job é um portão; o PR só pode ser mesclado com todos verdes (configure em
+# Settings → Branches → Require status checks: "quality", "test", "build").
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  quality:
+    name: Formatação, lint e design system
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Prettier
+        run: npm run format:check
+      - name: ESLint (quando disponível)
+        run: npm run lint --if-present
+      - name: Stylelint (tokens, BEM, sem cor fora de _tokens.scss)
+        run: npm run lint:style
+      - name: DESIGN.md (estrutura, referências e contraste WCAG)
+        run: npm run design:lint
+
+  test:
+    name: Testes unitários
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run test:coverage
+      - name: Publicar relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+
+  build:
+    name: Build (${{ matrix.config }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: [production, homologacao]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npx ng build --configuration ${{ matrix.config }}
+      - name: Verificar se o mock foi para o bundle
+        # Hoje só avisa: a main ainda empacota src/mocks (corrigido no PR #1).
+        # Depois que o #1 for mesclado, troque `::warning::` por `::error::` e adicione `exit 1`.
+        run: |
+          if grep -rl "Senha@123" dist/; then
+            echo "::warning::Credencial do backend simulado encontrada no bundle ${{ matrix.config }} (ver PR #1)"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.config }}
+          path: dist/sugestao-front/browser
+          retention-days: 7
+
+  audit:
+    name: Auditoria de dependências
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm audit --omit=dev --audit-level=high

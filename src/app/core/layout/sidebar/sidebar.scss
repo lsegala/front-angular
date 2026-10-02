@@ -3,7 +3,7 @@
   height: 100%;
   padding: 1rem 0;
   background: var(--color-surface);
-  border-right: 1px solid var(--color-border-light);
+  border-right: var(--border-width) solid var(--color-border-light);
 
   &[hidden] {
     display: none;
@@ -17,8 +17,8 @@
   @media (max-width: 63.99em) {
     position: absolute;
     inset: 0 auto 0 0;
-    z-index: 10;
-    box-shadow: 0.25rem 0 1rem rgb(0 0 0 / 20%);
+    z-index: var(--z-sidebar);
+    box-shadow: var(--shadow-lg);
   }
 }
 
@@ -43,6 +43,6 @@
   &--active {
     border-left-color: var(--color-primary);
     color: var(--color-primary);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
   }
 }

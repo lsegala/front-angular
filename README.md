@@ -208,14 +208,6 @@ form = this.fb.group({
 ```
 
 ```html
-<app-form-error-summary [form]="form" [submitAttempt]="submitAttempt()" />
-
-<app-text-field
-  inputId="nome"
-  label="cadastro.fields.name"
-  charset="letters"
-  [control]="form.controls.name"
-/>
 <app-email-field inputId="email" label="cadastro.fields.email" [control]="form.controls.email" />
 <app-text-field
   inputId="cpf"
@@ -304,6 +296,41 @@ projeto segue com Reactive Forms.
 - Erros de validação do backend (`{ "errors": { "campo": "mensagem" } }`) aparecem no próprio campo.
 - `GlobalErrorHandler` captura exceções não tratadas.
 
+## Design system
+
+A identidade visual está definida em [`DESIGN.md`](DESIGN.md) (formato
+[Google DESIGN.md](https://github.com/google-labs-code/design.md): tokens normativos em YAML +
+racional em prosa). Os mesmos valores vivem como custom properties em
+`src/assets/styles/_tokens.scss` — cor, tipografia, espaçamento, raio, sombra, z-index e tamanhos
+de toque. **Nenhum componente declara cor, tamanho de fonte ou sombra diretamente**; o Stylelint
+bloqueia hex/`rgb()` fora de `_tokens.scss` e exige classes no padrão BEM.
+
+```bash
+npm run lint:style     # Stylelint (tokens, BEM, SCSS)
+npm run design:lint    # valida DESIGN.md: referências, ordem das seções e contraste WCAG
+npm run design:export  # exporta tokens no formato W3C DTCG (design-tokens.json)
+```
+
+Ao mudar um valor: edite `DESIGN.md` → espelhe em `_tokens.scss` → `npm run design:lint`.
+
+## Pipeline
+
+`npm run ci` reproduz localmente o que o GitHub Actions roda em cada PR (`.github/workflows/ci.yml`):
+
+| Job       | O que verifica                                                                       |
+| --------- | ------------------------------------------------------------------------------------ |
+| `quality` | Prettier, ESLint (se existir), Stylelint, lint do `DESIGN.md`                        |
+| `test`    | Vitest com cobertura (artefato `coverage/`)                                          |
+| `build`   | Build `production` e `homologacao`; falha se a credencial do mock aparecer no bundle |
+| `audit`   | `npm audit` de dependências de produção (nível `high`)                               |
+
+Marque os três primeiros como _required status checks_ na proteção da branch `main`.
+
+**Homologação (stg):** `.github/workflows/deploy-stg.yml` publica o build `homologacao` no GitHub
+Pages a cada push na `main` (environment `staging`, com URL no PR). Ative em _Settings → Pages →
+Source: GitHub Actions_. Para outra hospedagem, troque só o job `deploy`; o artefato já sai pronto.
+
+Dependabot abre PRs semanais agrupando `@angular/*` e ferramentas de dev.
 ## Qualidade de código
 
 - **ESLint** (`npm run lint`): regras recomendadas do Angular e do TypeScript, acessibilidade nos templates e

@@ -1,10 +1,53 @@
-// Design tokens. Cores inspiradas no Padrão Digital de Governo (gov.br), com contraste
-// mínimo de 4,5:1 para texto (e-MAG 4.1 / WCAG 1.4.3).
+// Design tokens — fonte única de verdade do visual da aplicação.
+// A versão normativa (com a justificativa de cada valor) está em DESIGN.md na raiz do repositório;
+// mantenha os dois arquivos em sincronia e rode `npm run design:lint` ao alterar cores.
+// Cores inspiradas no Padrão Digital de Governo (gov.br), com contraste mínimo de 4,5:1 para texto
+// (e-MAG 4.1 / WCAG 1.4.3). Medidas em rem para que o ajuste de fonte da barra de acessibilidade
+// escale a página inteira (e-MAG 4.3 / WCAG 1.4.4).
 
 :root {
+  // ---------- Tipografia ----------
   --font-scale: 1;
-  --font-family: 'Rawline', 'Raleway', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-family: 'Rawline', 'Raleway', system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --font-family-mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', menlo, consolas, monospace;
 
+  --font-size-xs: 0.8125rem; // 13px — ícone de erro
+  --font-size-sm: 0.875rem; // 14px — dicas, rótulos secundários, badges
+  --font-size-md: 1rem; // 16px — corpo
+  --font-size-lg: 1.25rem; // 20px — título do cabeçalho, resumo de erros
+  --font-size-xl: 1.375rem; // 22px — h2
+  --font-size-2xl: 1.75rem; // 28px — h1
+
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-heading: 1.25;
+  --line-height-body: 1.5;
+
+  // ---------- Espaçamento (escala de 4px) ----------
+  --space-1: 0.25rem; // 4px
+  --space-2: 0.5rem; // 8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem; // 16px
+  --space-5: 1.25rem; // 20px
+  --space-6: 1.5rem; // 24px
+  --space-8: 2rem; // 32px
+  --space-10: 2.5rem; // 40px
+  --space-12: 3rem; // 48px
+  --space-16: 4rem; // 64px
+
+  // ---------- Dimensões ----------
+  --size-touch: 2.75rem; // 44px — área mínima de toque (WCAG 2.5.5)
+  --size-touch-sm: 2.25rem; // 36px — botões compactos dentro de tabelas/cabeçalho
+  --size-control-sm: 2rem; // 32px — controles da barra de acessibilidade
+  --sidebar-width: 16rem;
+  --content-max-width: 48rem; // leitura confortável (~75 caracteres)
+  --form-max-width: 32rem;
+  --form-max-width-wide: 56rem;
+
+  // ---------- Cores ----------
   --color-primary: #1351b4;
   --color-primary-dark: #0c326f;
   --color-primary-contrast: #ffffff;
@@ -30,8 +73,32 @@
   --color-footer-bg: #071d41;
   --color-footer-text: #ffffff;
 
-  --radius: 0.375rem;
-  --sidebar-width: 16rem;
+  // ---------- Forma ----------
+  --radius: 0.375rem; // 6px — campos, alertas, cartões
+  --radius-pill: 100em; // botões e badges
+  --radius-full: 50%; // botões circulares (ícone)
+
+  --border-width: 1px;
+  --border-width-strong: 2px; // campo inválido, borda do thead
+  --border-width-emphasis: 3px; // foco visível, resumo de erros
+  --border-accent: 0.375rem; // faixa lateral de alertas e notificações
+
+  // ---------- Elevação ----------
+  --shadow-sm: 0 1px 4px rgb(0 0 0 / 8%); // cabeçalho
+  --shadow-md: 0 0.25rem 0.75rem rgb(0 0 0 / 20%); // notificações
+  --shadow-lg: 0.25rem 0 1rem rgb(0 0 0 / 20%); // menu lateral sobreposto (mobile)
+
+  --z-sidebar: 10;
+  --z-notification: 1000;
+
+  // ---------- Movimento ----------
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  // ---------- Foco ----------
+  --focus-ring: var(--border-width-emphasis) solid var(--color-focus);
+  --focus-ring-offset: 2px;
 }
 
 // Alto contraste: fundo preto, texto branco, links e ações em amarelo.
@@ -61,7 +128,18 @@
   --color-footer-bg: #000000;
   --color-footer-text: #ffffff;
 
+  // Sombras não têm contraste em fundo preto; a separação fica por conta das bordas brancas.
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
   img {
     filter: grayscale(100%) contrast(120%);
   }
 }
+
+// Breakpoints para uso em Sass (@media não aceita custom properties).
+// md: grid de 2 colunas em formulários e listas de detalhes.
+// lg: menu lateral deixa de sobrepor o conteúdo.
+$breakpoint-md: 48em;
+$breakpoint-lg: 64em;
