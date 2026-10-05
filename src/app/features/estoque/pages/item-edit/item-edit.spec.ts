@@ -125,13 +125,18 @@ describe('ItemEdit', () => {
 
   it('notifica o erro do servidor quando o campo não existe no formulário', async () => {
     const { root, fillRequired, submit } = await setup();
-    const serverError = new HttpErrorResponse({ status: 422, error: { errors: { categoria: 'Inválida' } } });
+    const serverError = new HttpErrorResponse({
+      status: 422,
+      error: { errors: { categoria: 'Inválida' } },
+    });
     inventory.create.mockReturnValue(throwError(() => toAppError(serverError)));
 
     fillRequired();
     await submit();
 
-    expect(TestBed.inject(NotificationService).notifications()[0].messageKey).toBe('errors.validation');
+    expect(TestBed.inject(NotificationService).notifications()[0].messageKey).toBe(
+      'errors.validation',
+    );
     expect(root.querySelectorAll('.field--invalid')).toHaveLength(0);
   });
 
@@ -146,7 +151,9 @@ describe('ItemEdit', () => {
   });
 
   it('diferencia falha ao carregar de item inexistente', async () => {
-    inventory.getById.mockReturnValue(throwError(() => toAppError(new HttpErrorResponse({ status: 500 }))));
+    inventory.getById.mockReturnValue(
+      throwError(() => toAppError(new HttpErrorResponse({ status: 500 }))),
+    );
     const { root } = await setup('42');
 
     expect(root.textContent).toContain('Não foi possível carregar o item.');

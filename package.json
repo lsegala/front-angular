@@ -16,7 +16,7 @@
     "lint:style:fix": "stylelint \"src/**/*.scss\" --fix",
     "design:lint": "designmd lint DESIGN.md",
     "design:export": "designmd export --format dtcg DESIGN.md > design-tokens.json",
-    "ci": "npm run format:check && npm run lint:style && npm run design:lint && npm run test:ci && npm run build"
+    "ci": "npm run format:check && npm run lint:style && npm run design:lint && npm run test:ci && npm run build",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{ts,html,scss,json}\"",

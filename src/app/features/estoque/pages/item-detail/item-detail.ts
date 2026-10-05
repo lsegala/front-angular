@@ -12,7 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { isAppError } from '../../../core/error-handling/app-error';
+import { isAppError } from '@core/error-handling/app-error';
 import { NotificationService } from '@core/error-handling/notification.service';
 import { TranslatePipe } from '@core/localization/translate.pipe';
 import { TranslationService } from '@core/localization/translation.service';
