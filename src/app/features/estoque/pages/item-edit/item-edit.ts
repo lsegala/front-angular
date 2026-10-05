@@ -81,13 +81,20 @@ export class ItemEdit implements OnInit {
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly notFound = signal(false);
+  protected readonly loadFailed = signal(false);
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  protected load(): void {
     const id = this.id();
     if (!id) {
       return;
     }
     this.loading.set(true);
+    this.notFound.set(false);
+    this.loadFailed.set(false);
     this.inventory
       .getById(id)
       .pipe(
@@ -96,7 +103,11 @@ export class ItemEdit implements OnInit {
       )
       .subscribe({
         next: (item) => this.form.patchValue(item),
-        error: () => this.notFound.set(true),
+        // Só 404 é "não encontrado"; as demais falhas já foram notificadas pelo interceptor.
+        error: (error: unknown) =>
+          isAppError(error) && error.kind === 'not-found'
+            ? this.notFound.set(true)
+            : this.loadFailed.set(true),
       });
   }
 
@@ -121,21 +132,31 @@ export class ItemEdit implements OnInit {
     });
   }
 
-  /** Erros de validação do backend aparecem no campo correspondente e no resumo. */
+  /**
+   * Erros de validação do backend aparecem no campo correspondente e no resumo.
+   * 400/422 não geram notificação global (`handledErrors`), então um erro sem campo
+   * correspondente no formulário vira notificação para não se perder.
+   */
   private applyServerErrors(error: unknown): void {
     if (!isAppError(error)) {
       return;
     }
-    if (!error.fieldErrors) {
-      this.notifications.error(error.messageKey);
-      return;
-    }
-    for (const [field, message] of Object.entries(error.fieldErrors)) {
+    const fieldErrors = Object.entries(error.fieldErrors ?? {});
+    let applied = 0;
+    for (const [field, message] of fieldErrors) {
       const control = this.form.get(field);
-      control?.setErrors({ server: message });
-      control?.markAsTouched();
+      if (control) {
+        control.setErrors({ server: message });
+        control.markAsTouched();
+        applied++;
+      }
     }
-    this.submitAttempt.update((n) => n + 1);
+    if (applied < fieldErrors.length || applied === 0) {
+      this.notifications.error(error.messageKey);
+    }
+    if (applied > 0) {
+      this.submitAttempt.update((n) => n + 1);
+    }
   }
 
   private toPayload(): InventoryItemInput {

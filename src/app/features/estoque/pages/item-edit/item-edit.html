@@ -5,6 +5,14 @@
 } @else if (notFound()) {
   <div class="alert alert--error">{{ 'estoque.detail.notFound' | translate }}</div>
   <a routerLink="/estoque">{{ 'common.actions.back' | translate }}</a>
+} @else if (loadFailed()) {
+  <div class="alert alert--error">
+    <p>{{ 'estoque.detail.loadFailed' | translate }}</p>
+    <button type="button" class="btn btn--secondary btn--small" (click)="load()">
+      {{ 'estoque.list.retry' | translate }}
+    </button>
+  </div>
+  <a routerLink="/estoque">{{ 'common.actions.back' | translate }}</a>
 } @else {
   <p class="text-muted">{{ 'common.requiredFieldsNotice' | translate }}</p>
 

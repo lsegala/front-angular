@@ -123,6 +123,18 @@ describe('ItemEdit', () => {
     );
   });
 
+  it('notifica o erro do servidor quando o campo não existe no formulário', async () => {
+    const { root, fillRequired, submit } = await setup();
+    const serverError = new HttpErrorResponse({ status: 422, error: { errors: { categoria: 'Inválida' } } });
+    inventory.create.mockReturnValue(throwError(() => toAppError(serverError)));
+
+    fillRequired();
+    await submit();
+
+    expect(TestBed.inject(NotificationService).notifications()[0].messageKey).toBe('errors.validation');
+    expect(root.querySelectorAll('.field--invalid')).toHaveLength(0);
+  });
+
   it('carrega o item existente no modo edição', async () => {
     inventory.getById.mockReturnValue(of(SAVED));
     const { root, input } = await setup('42');
@@ -131,5 +143,14 @@ describe('ItemEdit', () => {
     expect(root.querySelector('h1')?.textContent).toContain('Editar item');
     expect(input('#item-name').value).toBe('Papel A4');
     expect(input('#item-unit-price').value).toBe('25,50');
+  });
+
+  it('diferencia falha ao carregar de item inexistente', async () => {
+    inventory.getById.mockReturnValue(throwError(() => toAppError(new HttpErrorResponse({ status: 500 }))));
+    const { root } = await setup('42');
+
+    expect(root.textContent).toContain('Não foi possível carregar o item.');
+    expect(root.textContent).not.toContain('Item não encontrado');
+    expect(root.querySelector('form')).toBeNull();
   });
 });

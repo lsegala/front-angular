@@ -38,6 +38,7 @@
     "updatedAt": "Last updated",
     "lowStockWarning": "Warning: quantity is at or below the minimum stock.",
     "notFound": "Item not found. It may have been deleted.",
+    "loadFailed": "The item could not be loaded.",
     "deleteConfirm": "Do you really want to delete \"{{name}}\"? This action cannot be undone.",
     "deleted": "Item deleted successfully."
   },
