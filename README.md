@@ -315,22 +315,40 @@ Ao mudar um valor: edite `DESIGN.md` → espelhe em `_tokens.scss` → `npm run 
 
 ## Pipeline
 
-`npm run ci` reproduz localmente o que o GitHub Actions roda em cada PR (`.github/workflows/ci.yml`):
+O projeto não tem pipeline de CI configurado no repositório. A verificação é feita localmente com
+`npm run ci`, que deve passar antes de abrir um PR:
 
-| Job       | O que verifica                                                                       |
-| --------- | ------------------------------------------------------------------------------------ |
-| `quality` | Prettier, ESLint (se existir), Stylelint, lint do `DESIGN.md`                        |
-| `test`    | Vitest com cobertura (artefato `coverage/`)                                          |
-| `build`   | Build `production` e `homologacao`; falha se a credencial do mock aparecer no bundle |
-| `audit`   | `npm audit` de dependências de produção (nível `high`)                               |
+| Etapa         | Comando                | O que verifica                                                |
+| ------------- | ---------------------- | ------------------------------------------------------------- |
+| Formatação    | `npm run format:check` | Prettier em `src/`                                            |
+| Estilos       | `npm run lint:style`   | Stylelint (tokens, BEM, SCSS)                                 |
+| Design system | `npm run design:lint`  | Referências, ordem das seções e contraste WCAG do `DESIGN.md` |
+| Testes        | `npm run test:ci`      | Vitest, uma execução                                          |
+| Build         | `npm run build`        | Build `production`                                            |
 
-Marque os três primeiros como _required status checks_ na proteção da branch `main`.
+O `npm run ci` não roda o ESLint; rode também `npm run lint` (inclui as regras de camadas). Antes de publicar,
+confira ainda:
 
-**Homologação (stg):** `.github/workflows/deploy-stg.yml` publica o build `homologacao` no GitHub
-Pages a cada push na `main` (environment `staging`, com URL no PR). Ative em _Settings → Pages →
-Source: GitHub Actions_. Para outra hospedagem, troque só o job `deploy`; o artefato já sai pronto.
+- `npm run build:hmg` — build de homologação;
+- que a credencial do mock (`MOCK_CREDENTIALS` em `src/mocks/mock-data.ts`) não aparece em `dist/`;
+- `npm audit --omit=dev --audit-level=high` — vulnerabilidades em dependências de produção.
 
-Dependabot abre PRs semanais agrupando `@angular/*` e ferramentas de dev.
+Ao configurar um CI (GitHub Actions, GitLab CI...), use essas mesmas etapas e marque-as como verificações
+obrigatórias na branch `main`.
+
+## Skills do Claude Code
+
+A pasta `.claude/skills/` traz skills que automatizam as tarefas repetitivas deste projeto, seguindo as
+convenções descritas neste README:
+
+| Skill             | Quando usar                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `nova-feature`    | Criar um domínio novo (rotas, data-access, páginas, i18n, menu, mock e testes)     |
+| `novo-campo-form` | Criar um campo compartilhado em `shared/forms` (select, checkbox, data...)         |
+| `mock-endpoint`   | Simular no backend de desenvolvimento um endpoint novo, inclusive cenários de erro |
+
+No Claude Code, peça a tarefa normalmente (ex.: "crie a feature fornecedores") ou chame `/nova-feature`.
+
 ## Qualidade de código
 
 - **ESLint** (`npm run lint`): regras recomendadas do Angular e do TypeScript, acessibilidade nos templates e
